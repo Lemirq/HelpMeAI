@@ -1,8 +1,13 @@
 'use client';
 
 import { useChat } from 'ai/react';
+import { User } from '@supabase/supabase-js';
 
-export default function Chat() {
+interface DashboardProps {
+	user: User;
+}
+
+export default function Chat({user}: DashboardProps) {
 	const { messages, input, handleInputChange, handleSubmit } = useChat();
 	return (
 		<div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">

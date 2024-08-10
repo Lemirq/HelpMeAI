@@ -1,10 +1,9 @@
 export default function Navbar() {
     return (
         <>
-            <nav className="bg-indigo-300 border-gray-200 dark:bg-gray-900">
+            <nav className="bg-gray-200 border-gray-200 dark:bg-gray-900">
                 <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                     <a href="#" className="flex ml-36 items-center space-x-3 rtl:space-x-reverse">
-                        <img src="#" className="h-8" alt="" />
                         <span className="text-indigo-900 text-2xl font-bold rounded-lg dark:text-white dark:hover:bg-gray-700"> HelpMe-AI</span>
                     </a>
                     <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">

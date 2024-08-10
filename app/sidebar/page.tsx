@@ -6,6 +6,7 @@ import { IoMdText } from "react-icons/io";
 import { MdContactSupport } from "react-icons/md";
 import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
 import Link from 'next/link';
+import { AppRoutes } from '@/lib/routes';
 
 type RecentChart = {
     id: number;
@@ -85,28 +86,28 @@ export default function Sidebar() {
                 <hr className="border border-gray-500 mb-4" />
                 <ul className="space-y-2 font-medium">
                     <li>
-                        <Link href={Help} className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <Link href={AppRoutes.HOME} className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <MdDashboard size={20} />
                             {isOpen && <span className="ms-3">Overview</span>}
                         </Link>
                     </li>
                     <li>
-                        <Link href="#" className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <Link href={AppRoutes.HOME}className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <FaInbox size={20} />
                             {isOpen && <span className="ms-3">Inbox</span>}
                         </Link>
                     </li>
                     <li>
-                        <a href="#" className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <Link href={AppRoutes.HOME}  className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <IoMdText size={20} />
                             {isOpen && <span className="ms-3">Chats</span>}
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="#" className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <Link href={AppRoutes.HOME} className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <MdContactSupport size={20} />
                             {isOpen && <span className="ms-3">Help</span>}
-                        </a>
+                        </Link>
                     </li>
                     <li>
                         <button onClick={toggleSidebar} className="w-full flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">

@@ -54,11 +54,8 @@ export default function Sidebar() {
                 id="sidebar"
                 className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
                 <div className="flex flex-col h-full bg-indigo-200 dark:bg-gray-800">
-                    <h2 className="flex items-center p-4 text-indigo-900 font-bold mb-2 rounded-lg dark:text-white dark:hover:bg-gray-700 group">
-                        <span className="ms-3 text-3xl font-bold"> HelpMe-AI </span>
-                    </h2>
                     <div className="flex-grow overflow-y-auto px-3 scrollbar-hide">
-                        <h3 className="text-lg font-semibold mb-2 sticky top-0 bg-indigo-200 dark:bg-gray-800 py-2"> Recent Charts: </h3>
+                        <h3 className="text-lg font-semibold mb-2 sticky top-0 text-orange-500 bg-indigo-200 py-2"> Recent Charts: </h3>
                         {recentCharts.map((chart) => (
                             <div key={chart.id} className="mb-2 hover:bg-gray-100 rounded-lg p-2">
                                 <h4 className="font-medium"> {chart.title} </h4>

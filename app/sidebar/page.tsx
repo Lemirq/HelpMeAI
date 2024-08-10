@@ -5,6 +5,7 @@ import { FaInbox } from "react-icons/fa6";
 import { IoMdText } from "react-icons/io";
 import { MdContactSupport } from "react-icons/md";
 import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
+import Link from 'next/link';
 
 type RecentChart = {
     id: number;
@@ -84,16 +85,16 @@ export default function Sidebar() {
                 <hr className="border border-gray-500 mb-4" />
                 <ul className="space-y-2 font-medium">
                     <li>
-                        <a href="#" className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <Link href={Help} className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <MdDashboard size={20} />
                             {isOpen && <span className="ms-3">Overview</span>}
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="#" className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <Link href="#" className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <FaInbox size={20} />
                             {isOpen && <span className="ms-3">Inbox</span>}
-                        </a>
+                        </Link>
                     </li>
                     <li>
                         <a href="#" className="flex p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">

@@ -11,7 +11,7 @@ const ChatPage = async () => {
 		error,
 	} = await supabase.auth.getUser();
 	if (!user || error) {
-		redirect('/');
+		redirect('/login');
 	}
 
 	return <Chat user_id={user.id} />;

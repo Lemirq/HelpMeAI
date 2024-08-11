@@ -121,7 +121,7 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 				return;
 			}
 			const chatId = data[0].id;
-			// router.push(`/chat/${chatId}`);
+			router.push(`/chat/${chatId}`);
 		}
 		if (id) {
 			renameChat(latestMessages, id);

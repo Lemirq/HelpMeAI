@@ -5,15 +5,22 @@ import { logout } from '@/app/login/actions';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { IoMenu } from 'react-icons/io5';
+import { AnimatePresence, motion } from 'framer-motion';
+import { IoAdd, IoMenu, IoTrash } from 'react-icons/io5';
+import { BsThreeDotsVertical } from 'react-icons/bs';
+import { Input } from './ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Label } from './ui/label';
+import { TextGenerateEffect } from './ui/text-generate-effect';
+
 const Sidebar = ({ user, allChats }: { user: any; allChats: any }) => {
 	const [chats, setChats] = useState(allChats || []);
 
 	const supabase = createClient();
 	const pathname = usePathname();
+	const router = useRouter();
 	useEffect(() => {
 		const channel = supabase
 			.channel('realtime chats')
@@ -25,16 +32,20 @@ const Sidebar = ({ user, allChats }: { user: any; allChats: any }) => {
 					table: 'chats',
 				},
 				(payload) => {
-					console.log(payload);
-					setChats((prev) => {
-						const index = prev.findIndex((chat) => chat.id === payload.old.id);
-						if (index === -1) {
-							return [...prev, payload.new];
-						}
-						const newChats = [...prev];
-						newChats[index] = payload.new;
-						return newChats;
-					});
+					if (payload.eventType === 'DELETE') {
+						setChats((prev) => prev.filter((chat) => chat.id !== payload.old.id));
+						return;
+					}
+					if (payload.eventType === 'UPDATE') {
+						setChats((prev) => {
+							const newChats = [...prev];
+							const index = newChats.findIndex((chat) => chat.id === payload.old.id);
+							newChats[index] = payload.new;
+							return newChats;
+						});
+						return;
+					}
+					setChats((prev) => [...prev, payload.new]);
 				}
 			)
 			.subscribe();
@@ -47,10 +58,11 @@ const Sidebar = ({ user, allChats }: { user: any; allChats: any }) => {
 
 	return (
 		<>
-			<div className="fixed top-0 py-4 px-5 fr justify-start sm:hidden w-full bg-white/60 backdrop-blur-2xl">
+			<div className="fixed top-0 py-4 px-5 gap-3 fr justify-start sm:hidden w-full bg-white/60 backdrop-blur-2xl">
 				<button className="text-2xl" onClick={() => setVisible(!visible)}>
 					<IoMenu />
 				</button>
+				<h1 className="text-xl font-bold">TubeAssist</h1>
 			</div>
 			<motion.div
 				initial={{ opacity: 0 }}
@@ -70,22 +82,63 @@ const Sidebar = ({ user, allChats }: { user: any; allChats: any }) => {
 				<div className="h-full px-3 py-4 fc items-start overflow-y-auto bg-gray-900 relative">
 					<h2 className="flex items-center p-2 font-bold mb-4 font rounded-lg group">TubeAssist</h2>
 					<div className="h-full fc items-start justify-start w-full gap-2">
-						{chats
-							.sort((a, b) => a.created_at - b.created_at)
-							.map((chat) => {
-								console.log(chat.id);
-								return (
-									<Link
-										key={chat.id}
-										className={cn('w-full px-3 text-sm py-2 rounded-xl transition-colors hover:bg-gray-600', {
-											'bg-gray-700': pathname.includes(chat.id),
-										})}
-										href={`/chat/${chat.id}`}
-									>
-										{chat.name}
-									</Link>
-								);
-							})}
+						<Link href="/chat" className="w-full px-3 text-sm py-2 fr justify-start rounded-xl transition-colors hover:bg-gray-600">
+							<IoAdd className="mr-2 text-xl" /> New Chat
+						</Link>
+						<AnimatePresence>
+							{chats
+								.sort((a, b) => a.created_at - b.created_at)
+								.map((chat) => {
+									console.log(chat.id);
+									return (
+										<motion.div
+											initial={{ opacity: 0 }}
+											animate={{ opacity: 1 }}
+											exit={{ opacity: 0 }}
+											key={chat.id}
+											className={cn(
+												'w-full px-3 text-sm py-2 fr justify-between rounded-xl transition-colors hover:bg-gray-600',
+												{
+													'bg-gray-700': pathname.includes(chat.id),
+												}
+											)}
+										>
+											<Link className="w-full" href={`/chat/${chat.id}`}>
+												{chat.name !== 'New Chat' ? <TextGenerateEffect words={chat.name} /> : 'New Chat'}
+											</Link>
+											<Popover>
+												<PopoverTrigger asChild>
+													<button>
+														<BsThreeDotsVertical />
+													</button>
+												</PopoverTrigger>
+												<PopoverContent className="w-48">
+													<div>
+														<button
+															onClick={async (e) => {
+																e.stopPropagation();
+																const { data, error } = await supabase.from('chats').delete().eq('id', chat.id);
+																if (error) {
+																	console.error(error);
+																	return;
+																}
+
+																console.log(data);
+
+																router.push('/chat');
+															}}
+															className="w-full bg-white rounded-md fr px-2 py-1 gap-2 transition-colors hover:bg-gray-100"
+														>
+															<IoTrash className="text-red-500" />
+															<span className="w-full text-left">Delete</span>
+														</button>
+													</div>
+												</PopoverContent>
+											</Popover>
+										</motion.div>
+									);
+								})}
+						</AnimatePresence>
 					</div>
 					<form className="flex items-center p-2 rounded-lg group" action={logout}>
 						<FaArrowRightFromBracket />

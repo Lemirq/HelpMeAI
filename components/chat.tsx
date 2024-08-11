@@ -141,7 +141,6 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 						}
 
 						if (!id) {
-							console.log(latestMessages);
 							const { data: iData, error: iError } = await supabase
 								.from('chats')
 								.insert({ messages: JSON.stringify(latestMessages), user_id });

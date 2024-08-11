@@ -46,7 +46,7 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 			<div className="fc w-full max-w-xl py-24 mx-auto stretch">
 				<div className="fc items-start gap-10">
 					{messages.map((m, i) => (
-						<div className="w-full fr gap-2 justify-start items-start">
+						<div key={i} className="w-full fr gap-2 justify-start items-start">
 							{m.role === 'user' ? <IoPerson className="text-2xl" /> : <FaRobot className="text-2xl" />}
 							<div key={i} className="whitespace-pre-wrap text-base w-full">
 								<ReactMarkdown>{m.content as string}</ReactMarkdown>

@@ -7,7 +7,7 @@ export async function continueConversation(messages: CoreMessage[]) {
 	const result = await streamText({
 		model: google('models/gemini-1.5-flash-latest'),
 		messages:
-			messages.length === 1
+			messages.length === 2
 				? [
 						{
 							role: 'system',

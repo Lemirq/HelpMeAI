@@ -1,7 +1,7 @@
 'use client';
 
 import { type CoreMessage } from 'ai';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { continueConversation } from '@/app/chat/actions';
 import { readStreamableValue } from 'ai/rsc';
 import Sidebar from './sidebar';
@@ -19,6 +19,16 @@ export const maxDuration = 30;
 
 export default function Chat({ user_id, SupaMessages, id }: { user_id: string; SupaMessages: CoreMessage[]; id?: string }) {
 	const [messages, setMessages] = useState<CoreMessage[] | null>(null);
+
+	const messagesRef = useRef<HTMLDivElement>(null);
+	const scrollToBottom = () => {
+		messagesRef.current?.scrollIntoView({ behavior: 'smooth' });
+	};
+
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
+
 	const [input, setInput] = useState('');
 	useEffect(() => {
 		if (SupaMessages) {
@@ -27,7 +37,12 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 			}
 			setMessages(SupaMessages);
 		} else {
-			setMessages([]);
+			setMessages([
+				{
+					role: 'assistant',
+					content: 'Hello! I am HelpMeAi, your personal assistant for all things Youtube. How can I help you today?',
+				},
+			]);
 		}
 	}, []);
 
@@ -72,10 +87,12 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 							);
 						})}
 				</div>
+				<div className="h-1 w-full" ref={messagesRef} />
 
 				<form
 					onSubmit={async (e) => {
 						e.preventDefault();
+						if (!input) return;
 						const newMessages: CoreMessage[] = [...messages, { content: input, role: 'user' }];
 
 						setMessages(newMessages);

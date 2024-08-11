@@ -8,16 +8,18 @@ import Sidebar from './sidebar';
 import { createClient } from '@/utils/supabase/client';
 import { Input } from './ui/input';
 import { IoMdArrowRoundForward, IoMdChatbubbles } from 'react-icons/io';
+import { IoPerson } from 'react-icons/io5';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
+import { FaRobot } from 'react-icons/fa';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 export default function Chat({ user_id, SupaMessages, id }: { user_id: string; SupaMessages: CoreMessage[]; id: string }) {
 	console.log(SupaMessages);
-	const [messages, setMessages] = useState([]);
+	const [messages, setMessages] = useState<CoreMessage[]>([]);
 	const [input, setInput] = useState('');
 
 	useEffect(() => {
@@ -41,13 +43,17 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 	return (
 		<>
 			<Sidebar />
-			<div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-				{messages.map((m, i) => (
-					<div key={i} className="whitespace-pre-wrap">
-						{m.role === 'user' ? 'User: ' : 'AI: '}
-						<ReactMarkdown>{m.content as string}</ReactMarkdown>
-					</div>
-				))}
+			<div className="fc w-full max-w-xl py-24 mx-auto stretch">
+				<div className="fc items-start gap-10">
+					{messages.map((m, i) => (
+						<div className="w-full fr gap-2 justify-start items-start">
+							{m.role === 'user' ? <IoPerson className="text-2xl" /> : <FaRobot className="text-2xl" />}
+							<div key={i} className="whitespace-pre-wrap text-base w-full">
+								<ReactMarkdown>{m.content as string}</ReactMarkdown>
+							</div>
+						</div>
+					))}
+				</div>
 
 				<form
 					onSubmit={async (e) => {

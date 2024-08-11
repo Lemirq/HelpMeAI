@@ -28,7 +28,7 @@ export default function Home() {
 						<Link href="/login">Login</Link>
 					</Button>
 					<Button className="px-6 py-2 text-white bg-green-600 hover:bg-green-700 rounded-md">
-						<Link href="/dashboard">Dashboard</Link>
+						<Link href="/chat">Chat</Link>
 					</Button>
 				</div>
 			</motion.div>

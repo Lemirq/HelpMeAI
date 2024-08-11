@@ -29,7 +29,7 @@ export async function login(origin) {
 	}
 
 	revalidatePath('/', 'layout');
-	redirect('/dashboard');
+	redirect('/chat');
 }
 
 export async function logout() {

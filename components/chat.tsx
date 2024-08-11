@@ -17,16 +17,23 @@ import { FaRobot } from 'react-icons/fa';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-export default function Chat({ user_id, SupaMessages, id }: { user_id: string; SupaMessages: CoreMessage[]; id: string }) {
-	console.log(SupaMessages);
-	const [messages, setMessages] = useState<CoreMessage[]>([]);
+export default function Chat({ user_id, SupaMessages, id }: { user_id: string; SupaMessages: CoreMessage[]; id?: string }) {
+	const [messages, setMessages] = useState<CoreMessage[] | null>(null);
 	const [input, setInput] = useState('');
-
 	useEffect(() => {
 		if (SupaMessages) {
+			if (typeof SupaMessages === 'string') {
+				SupaMessages = JSON.parse(SupaMessages);
+			}
 			setMessages(SupaMessages);
+		} else {
+			setMessages([]);
 		}
 	}, []);
+
+	useEffect(() => {
+		console.log(messages);
+	}, [messages]);
 
 	const supabase = createClient();
 
@@ -36,6 +43,7 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 			console.error(error);
 			return;
 		}
+		console.log(data);
 	};
 
 	const router = useRouter();
@@ -45,14 +53,24 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 			<Sidebar />
 			<div className="fc w-full max-w-xl py-24 mx-auto stretch">
 				<div className="fc items-start gap-10">
-					{messages.map((m, i) => (
-						<div key={i} className="w-full fr gap-2 justify-start items-start">
-							{m.role === 'user' ? <IoPerson className="text-2xl" /> : <FaRobot className="text-2xl" />}
-							<div key={i} className="whitespace-pre-wrap text-base w-full">
-								<ReactMarkdown>{m.content as string}</ReactMarkdown>
-							</div>
-						</div>
-					))}
+					{messages &&
+						messages.map((m, i) => {
+							if (m.role === 'system') return null;
+							return (
+								<div key={i} className="w-full fr gap-2 justify-start items-start">
+									{m.role === 'user' ? <IoPerson className="text-2xl" /> : <FaRobot className="text-2xl" />}
+									<div key={i} className="whitespace-pre-wrap text-base w-full">
+										<ReactMarkdown
+											components={{
+												a: ({ node, ...props }) => <a className="" {...props} target="_blank" rel="noreferrer noopener" />,
+											}}
+										>
+											{m.content as string}
+										</ReactMarkdown>
+									</div>
+								</div>
+							);
+						})}
 				</div>
 
 				<form
@@ -63,13 +81,53 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 						setMessages(newMessages);
 
 						// either create new chat or update existing chat
-						if (!id) {
-							console.log(messages);
-							console.log(user_id);
+						if (id) {
+							await updateChat(newMessages);
+						}
 
+						setInput('');
+
+						const result = await continueConversation(newMessages);
+						let latestMessages = [];
+
+						for await (const content of readStreamableValue(result)) {
+							console.log(content);
+							setMessages([
+								...newMessages,
+								{
+									role: 'assistant',
+									content: content as string,
+								},
+							]);
+							if (id) {
+								await updateChat([
+									...newMessages,
+									{
+										role: 'assistant',
+										content: content as string,
+									},
+								]);
+							} else {
+								latestMessages = [
+									{
+										role: 'system',
+										content:
+											"Your name is HelpMeAi (always state your name in bold). You are a helpful AI Assistant that is specialized in helping customers of Youtube. You must be very respectful at all times, understand the user's requests, and provide accurate information and solutions at all times. If the user asks that is not related to Youtube help, please state that the user is going off topic, and that you are made specifically for help with Youtube. YOU MUST NOT PROVIDE ANY INFORMATION THAT IS NOT RELATED TO YOUTUBE, INSTEAD SAY THAT YOU ARE NOT PROGRAMMED TO HELP WITH THAT TOPIC.",
+									},
+									...newMessages,
+									{
+										role: 'assistant',
+										content: content as string,
+									},
+								];
+							}
+						}
+
+						if (!id) {
+							console.log(latestMessages);
 							const { data: iData, error: iError } = await supabase
 								.from('chats')
-								.insert({ messages: JSON.stringify(newMessages), user_id });
+								.insert({ messages: JSON.stringify(latestMessages), user_id });
 							console.log(iData);
 							if (iError) {
 								console.error(iError);
@@ -87,29 +145,6 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 							}
 							const chatId = data[0].id;
 							router.push(`/chat/${chatId}`);
-						} else {
-							await updateChat(newMessages);
-						}
-
-						setInput('');
-
-						const result = await continueConversation(newMessages);
-
-						for await (const content of readStreamableValue(result)) {
-							setMessages([
-								...newMessages,
-								{
-									role: 'assistant',
-									content: content as string,
-								},
-							]);
-							await updateChat([
-								...newMessages,
-								{
-									role: 'assistant',
-									content: content as string,
-								},
-							]);
 						}
 					}}
 				>
